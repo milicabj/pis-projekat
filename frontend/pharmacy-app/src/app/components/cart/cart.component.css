@@ -1,0 +1,122 @@
+/* === TABELA === */
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  font-size: 16px;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.cart-table th, .cart-table td {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.cart-product-image {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  background: #f9f9f9;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.cart-table th {
+  background-color: #f0f9f0;
+  font-weight: bold;
+  color: #035f19;
+  font-size: 15px;
+}
+
+/* === DUGMAD === */
+.qty-btn, .remove-btn, .order-btn {
+  padding: 6px 12px;
+  background-color: #035f19;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  margin: 0 4px;
+  transition: background-color 0.2s ease;
+}
+
+.qty-btn:hover, .remove-btn:hover, .order-btn:hover {
+  background-color: #024213;
+}
+
+/* === TOTAL CIJENA === */
+.cart-total {
+  margin-top: 25px;
+  text-align: right;
+  font-size: 20px;
+  font-weight: bold;
+  color: #035f19;
+}
+
+/* === PRAZNA KORPA === */
+.empty-cart-message {
+  margin: 40px auto;
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+  font-style: italic !important;
+}
+.korpa{
+  color: darkgreen;
+  text-align: center;
+  
+}
+
+.prazna{
+  font-style: italic;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+/* === Dugme 'Naruči' === */
+.order-btn {
+  display: block;
+  margin: 30px auto 0 auto; /* auto centriranje */
+  padding: 10px 22px;
+  background-color: #035f19;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.order-btn:hover {
+  background-color: #024213;
+}
+
+/* === Dugme 'Ukloni' === */
+.remove-btn {
+  padding: 6px 12px;
+  background-color: #940f0f;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background-color: #6d0b0b;
+}

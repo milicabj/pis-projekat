@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: pharmacy-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - pharmacy-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: pharmacy-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - pharmacy-net
+
+  backend:
+    build: ./backend
+    container_name: pharmacy-backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/pharmacy
+      JWT_SECRET: tajni_kljuc
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: http://localhost
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - pharmacy-net
+
+  frontend:
+    build: ./frontend/pharmacy-app
+    container_name: pharmacy-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - pharmacy-net
+
+volumes:
+  mongo-data:
+
+networks:
+  pharmacy-net:
+    driver: bridge

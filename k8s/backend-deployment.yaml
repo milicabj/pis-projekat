@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: pharmacy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: pharmacy-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: pharmacy-config
+                  key: MONGO_URI
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pharmacy-config
+                  key: REDIS_URL
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: pharmacy-config
+                  key: CORS_ORIGIN
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pharmacy-secret
+                  key: JWT_SECRET

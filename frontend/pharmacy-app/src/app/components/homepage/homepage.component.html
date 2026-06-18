@@ -1,0 +1,61 @@
+<div class="homepage-carousel">
+  <div class="carousel-wrapper">
+    <img 
+      [src]="carouselImages[currentImageIndex]" 
+      alt="Promotivna slika" 
+      class="carousel-image"
+    />
+  </div>
+
+  <div class="carousel-dots">
+    <span 
+      *ngFor="let img of carouselImages; let i = index" 
+      class="dot" 
+      [class.active]="i === currentImageIndex" 
+      (click)="showImage(i)">
+    </span>
+  </div>
+</div>
+
+
+<h2 class="section-title">IZDVOJENE KATEGORIJE</h2>
+
+<div class="featured-categories">
+  <div class="category-card" *ngFor="let category of featuredCategories" (click)="goToCategory(category.id)">
+    <img
+      [src]="category.imageUrl"
+      (error)="onCategoryImageError($event)"
+      [alt]="category.name"
+    />
+    <h3>{{ category.name }}</h3>
+  </div>
+</div>
+
+
+<section class="top-products-section">
+  <h2>NAJPRODAVANIJE</h2>
+  <div class="pink-line"></div>
+
+  <div class="slider-wrapper">
+    <button class="arrow left" (click)="scrollSlider('left')">&#10094;</button>
+
+    <div class="slider" #sliderContainer>
+      <div class="slide" *ngFor="let product of topProducts">
+        <app-product-card [product]="product"></app-product-card>
+      </div>
+    </div>
+
+    <button class="arrow right" (click)="scrollSlider('right')">&#10095;</button>
+  </div>
+</section>
+
+
+<section class="brands-section">
+  <h2>POPULARNI BRENDOVI</h2>
+  <div class="pink-line"></div>
+  <div class="brands-grid">
+    <img *ngFor="let brand of brands" [src]="brand.logo" alt="{{ brand.name }}" />
+  </div>
+</section>
+
+

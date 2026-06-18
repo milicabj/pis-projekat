@@ -1,0 +1,27 @@
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>PharmaViridis</h4>
+      <p>Tvoja online apoteka – brzo, sigurno i povoljno.</p>
+      <a routerLink="/"><img src="assets/logo4.jpg" alt="PharmaViridis" height="40" /></a>
+    </div>
+
+    <div class="footer-section">
+      <h4>Linkovi</h4>
+      <a routerLink="/products">Svi proizvodi</a>
+      <a routerLink="/cart">Korpa</a>
+      <a routerLink="/orders" *ngIf="authService.isLoggedIn()">Moje porudžbine</a>
+      <a routerLink="/login" *ngIf="!authService.isLoggedIn()">Prijava</a>
+    </div>
+
+    <div class="footer-section">
+      <h4>Kontakt</h4>
+      <p>Email: info@pharmaviridis.me</p>
+      <p>Telefon: +382 67 123 456</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; {{ currentYear }} PharmaViridis. Sva prava zadržana.</p>
+  </div>
+</footer>

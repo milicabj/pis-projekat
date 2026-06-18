@@ -1,0 +1,38 @@
+<h2 class="title">Moje porudžbine</h2>
+
+<div *ngIf="orders.length > 0; else nema" class="orders-container">
+  <div *ngFor="let order of orders" class="order-card">
+    <div class="order-header">
+      <div><strong>ID:</strong> {{ order._id }}</div>
+      <div><strong>Datum:</strong> {{ order.createdAt | date:'short' }}</div>
+    </div>
+
+    <div class="order-items">
+      <div *ngFor="let item of order.items" class="order-item">
+        <div class="product-info">
+          <img
+            *ngIf="item.product"
+            [src]="getImageUrl(item.product)"
+            (error)="onImageError($event)"
+            [alt]="item.product.name"
+            class="order-product-image"
+          />
+          <span class="product-name">{{ item.product?.name || item.productId }}</span>
+        </div>
+        <span class="quantity">x{{ item.quantity }}</span>
+        <span class="price">{{ item.product?.price | currency:'EUR' }}</span>
+        <div class="order-total">
+        <strong>Ukupno:</strong> {{ order.totalPrice | currency:'EUR' }}
+        <div class="order-status" [ngClass]="order.status">
+        Status: {{ order.status | titlecase }}
+        </div>
+
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #nema>
+  <p class="no-orders">Nemate nijednu porudžbinu.</p>
+</ng-template>

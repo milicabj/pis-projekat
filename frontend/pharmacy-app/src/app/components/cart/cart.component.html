@@ -1,0 +1,44 @@
+<h2 class="korpa">Moja korpa</h2>
+
+<div class="prazna">
+<div *ngIf="items.length === 0" class="empty-cart">
+      Vaša korpa je prazna.
+</div>
+</div>
+
+<table class="cart-table" *ngIf="items.length > 0">
+  <thead>
+    <tr>
+      <th>Proizvod</th>
+      <th>Količina</th>
+      <th>Cijena</th>
+      <th>Akcija</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of items">
+      <td class="product-cell">
+        <img
+          [src]="getImageUrl(item.product)"
+          (error)="onImageError($event)"
+          [alt]="item.product.name"
+          class="cart-product-image"
+        />
+        <span>{{ item.product.name }}</span>
+      </td>
+      <td>
+        <button class="qty-btn" (click)="decreaseQuantity(item)">−</button>
+        {{ item.quantity }}
+        <button class="qty-btn" (click)="increaseQuantity(item)">+</button>
+      </td>
+      <td>{{ item.product.price * item.quantity | number:'1.2-2' }} €</td>
+      <td>
+        <button class="remove-btn" (click)="removeItem(item.product._id)">Ukloni</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="cart-total" *ngIf="items.length > 0">Ukupno: {{ total | number:'1.2-2' }} €</p>
+
+<button class="order-btn" *ngIf="items.length > 0" (click)="placeOrder()">Naruči</button>

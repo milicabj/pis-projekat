@@ -1,0 +1,12 @@
+.hero {
+  background: white;
+  padding: 40px 0;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+.hero-logo {
+  max-width: 200px;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+}

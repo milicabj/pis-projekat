@@ -1,0 +1,69 @@
+<h3>Dodaj novi proizvod</h3>
+
+
+<form (ngSubmit)="addProduct()" #productForm="ngForm" class="add-form">
+  <input type="text" [(ngModel)]="newProduct.name" name="name" placeholder="Naziv" required />
+  <input type="text" [(ngModel)]="newProduct.description" name="description" placeholder="Opis" required />
+  <input type="number" [(ngModel)]="newProduct.price" name="price" placeholder="Cijena" step="0.01" required />
+  <input type="text" [(ngModel)]="newProduct.imageUrl" name="imageUrl" placeholder="URL slike" required />
+
+  <select [(ngModel)]="newProduct.category" name="category" required>
+    <option value="" disabled selected>Kategorija</option>
+    <option *ngFor="let c of categories" [value]="c._id">{{ c.name }}</option>
+  </select>
+
+  <select [(ngModel)]="newProduct.manufacturer" name="manufacturer" required>
+    <option value="" disabled selected>Proizvođač</option>
+    <option *ngFor="let m of manufacturers" [value]="m._id">{{ m.name }}</option>
+  </select>
+
+  <button type="submit">Dodaj</button>
+</form>
+
+<h2>Lista proizvoda</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Naziv</th>
+      <th>Opis</th>
+      <th>Cijena</th>
+      <th>Slika</th>
+      <th>Kategorija </th>
+      <th>Proizvođač </th>
+      <th>Akcije</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let product of products">
+      <ng-container *ngIf="editingProduct?._id === product._id; else viewMode">
+        <td><input [(ngModel)]="editingProduct.name" /></td>
+        <td><input [(ngModel)]="editingProduct.description" /></td>
+        <td><input [(ngModel)]="editingProduct.price" type="number" /></td>
+        <td><input [(ngModel)]="editingProduct.imageUrl" /></td>
+        <td><input [(ngModel)]="editingProduct.category" /></td>
+        <td><input [(ngModel)]="editingProduct.manufacturer" /></td>
+        <td>
+          <button (click)="saveEdit()">Sačuvaj</button>
+          <button (click)="cancelEdit()">Otkaži</button>
+        </td>
+      </ng-container>
+
+      <ng-template #viewMode>
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.price }} €</td>
+        <td>
+          <img [src]="product.imageUrl || 'assets/products/product-1.jpg'" width="72" height="72" style="object-fit:cover;border-radius:8px;" [alt]="product.name" />
+        </td>
+        <td>{{ product.category.name }}</td>
+        <td>{{ product.manufacturer.name }}</td>
+        <td>
+          <button (click)="startEdit(product)">Izmijeni</button>
+          <button (click)="deleteProduct(product._id)">Obriši</button>
+        </td>
+      </ng-template>
+    </tr>
+  </tbody>
+</table>
+

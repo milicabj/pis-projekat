@@ -1,0 +1,50 @@
+<!-- GORNJI BAR -->
+<div class="top-bar">
+  <span>✔️ Besplatna dostava za porudžbine preko 35 €</span>
+  <span>✔️ Non-stop niske cijene</span>
+  <span>✔️ Jednostavno i brzo</span>
+</div>
+
+<!-- GLAVNI NAVBAR -->
+<div class="navbar">
+  <div class="logo">
+    <a routerLink="/"><img src="assets/logo4.jpg" alt="PharmaViridis" height="40" /></a>
+  </div>
+
+ <div class="search-wrapper">
+  <input
+    type="text"
+    class="search-input"
+    [(ngModel)]="searchTerm"
+    (keyup.enter)="onSearch()"
+    placeholder="Pretraži proizvode..."
+  />
+  <i class="bi bi-search search-icon" (click)="onSearch()"></i>
+</div>
+
+
+   <button *ngIf="authService.isLoggedIn()" class="logout-btn" (click)="logout()">
+  <i class="bi bi-box-arrow-right"></i> Odjavi se
+  </button>
+  <div class="user-cart">
+  
+
+    <!-- KORISNIK -->
+    <i class="bi bi-person-circle icon" (click)="handleUserClick()"></i>
+    <!-- KORPA -->
+    <i class="bi bi-cart-fill icon" (click)="goToCart()"></i>
+
+  </div>
+
+ 
+</div>
+ 
+
+<!-- KATEGORIJSKI BAR ISPOD -->
+<div class="category-bar">
+  <a (click)="goToAllProducts()">Svi proizvodi</a>
+
+  <a *ngFor="let category of categories" (click)="goToCategory(category)">
+    {{ category.name }}
+  </a>
+</div>

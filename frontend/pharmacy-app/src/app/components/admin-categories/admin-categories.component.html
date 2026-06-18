@@ -1,0 +1,51 @@
+<h2>Dodaj novu kategoriju</h2>
+
+<div class="form-block">
+  <input [(ngModel)]="newCategory.name" placeholder="Naziv kategorije" />
+  <input [(ngModel)]="newCategory.description" placeholder="Opis kategorije" />
+  <input [(ngModel)]="newCategory.imageUrl" placeholder="URL slike" />
+  <button (click)="addCategory()">Dodaj</button>
+</div>
+
+<h2>Lista kategorija</h2>
+<!-- Tabela sa kategorijama -->
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Naziv</th>
+      <th>Opis</th>
+      <th>Slika</th>
+      <th>Akcije</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let category of categories">
+      <td *ngIf="editingCategory?._id !== category._id">{{ category.name }}</td>
+      <td *ngIf="editingCategory?._id !== category._id">{{ category.description }}</td>
+      <td *ngIf="editingCategory?._id !== category._id">
+        <img *ngIf="category.imageUrl" [src]="category.imageUrl" width="50" alt="{{ category.name }}" />
+      </td>
+
+      <td *ngIf="editingCategory?._id === category._id">
+        <input [(ngModel)]="editingCategory.name" />
+      </td>
+      <td *ngIf="editingCategory?._id === category._id">
+        <input [(ngModel)]="editingCategory.description" />
+      </td>
+      <td *ngIf="editingCategory?._id === category._id">
+        <input [(ngModel)]="editingCategory.imageUrl" placeholder="URL slike" />
+      </td>
+
+      <td>
+        <ng-container *ngIf="editingCategory?._id !== category._id">
+          <button (click)="startEdit(category)">Izmijeni</button>
+          <button (click)="deleteCategory(category._id)">Obriši</button>
+        </ng-container>
+        <ng-container *ngIf="editingCategory?._id === category._id">
+          <button (click)="saveEdit()">Sačuvaj</button>
+          <button (click)="cancelEdit()">Otkaži</button>
+        </ng-container>
+      </td>
+    </tr>
+  </tbody>
+</table>

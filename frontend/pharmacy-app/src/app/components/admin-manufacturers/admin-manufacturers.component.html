@@ -1,0 +1,43 @@
+<!-- admin-manufacturers.component.html -->
+<h2>Dodaj novog proizvođača</h2>
+
+<div class="form-block">
+  <input [(ngModel)]="newManufacturer.name" placeholder="Naziv proizvođača" />
+  <input [(ngModel)]="newManufacturer.country" placeholder="Država" />
+  <button (click)="addManufacturer()">Dodaj proizvođača</button>
+</div>
+
+<h2>Lista proizvođača</h2>
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Naziv</th>
+      <th>Država</th>
+      <th>Akcije</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let manufacturer of manufacturers">
+      <td *ngIf="editingId !== manufacturer._id">{{ manufacturer.name }}</td>
+      <td *ngIf="editingId === manufacturer._id">
+        <input [(ngModel)]="editableManufacturer.name" />
+      </td>
+
+      <td *ngIf="editingId !== manufacturer._id">{{ manufacturer.country }}</td>
+      <td *ngIf="editingId === manufacturer._id">
+        <input [(ngModel)]="editableManufacturer.country" />
+      </td>
+
+      <td>
+        <ng-container *ngIf="editingId === manufacturer._id; else editDeleteBtns">
+          <button class="edit-btn" (click)="saveEdit(manufacturer._id)">Sačuvaj</button>
+          <button class="cancel-btn" (click)="cancelEdit()">Otkaži</button>
+        </ng-container>
+        <ng-template #editDeleteBtns>
+          <button class="edit-btn" (click)="startEdit(manufacturer)">Izmijeni</button>
+          <button class="delete-btn" (click)="deleteManufacturer(manufacturer._id)">Obriši</button>
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+</table>

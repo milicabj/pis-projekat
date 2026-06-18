@@ -1,0 +1,12 @@
+# env
+backend/.env
+
+# dependencies
+backend/node_modules/
+frontend/pharmacy-app/node_modules/
+
+# Angular build output
+frontend/pharmacy-app/dist/
+
+# OS
+.DS_Store

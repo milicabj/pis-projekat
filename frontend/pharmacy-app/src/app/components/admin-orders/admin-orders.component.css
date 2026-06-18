@@ -1,0 +1,83 @@
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+thead tr {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+th {
+  text-align: left;
+  padding: 12px;
+  font-size: 15px;
+}
+
+td {
+  background-color: #fff;
+  padding: 12px;
+  vertical-align: top;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  color: #444;
+}
+
+tr {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+}
+
+ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+select {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Status colors (već dodato ranije) */
+select.pending {
+  background-color: #fff9c4;
+  border-color: #fbc02d;
+}
+
+select.processing {
+  background-color: #bbdefb;
+  border-color: #2196f3;
+}
+
+select.completed {
+  background-color: #c8e6c9;
+  border-color: #4caf50;
+}
+
+select.cancelled {
+  background-color: #ffcdd2;
+  border-color: #f44336;
+}
+
+/* Dugme obrisi */
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #e53935;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #c62828;
+}

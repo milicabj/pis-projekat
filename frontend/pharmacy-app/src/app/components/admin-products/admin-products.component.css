@@ -1,0 +1,105 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #333;
+}
+
+img {
+  max-width: 50px;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Glavna forma (dodavanje/izmjena) */
+.form-card {
+  background-color: #f9f9f9;
+  padding: 20px 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+form input,
+form select,
+form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+/* Glavna dugmad */
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  margin-top: 5px;
+}
+
+/* ZELENA: Dodaj */
+form button {
+  background-color: #40916c;
+  color: white;
+  font-weight: bold;
+}
+
+form button:hover {
+  background-color: #2d6a4f;
+}
+
+/* ŽUTA: Izmijeni */
+button.edit-btn {
+  background-color: #ffca28;
+  color: #333;
+}
+
+button.edit-btn:hover {
+  background-color: #f4b400;
+}
+
+/* CRVENA: Obriši */
+button.delete-btn {
+  background-color: #ef5350;
+  color: white;
+}
+
+button.delete-btn:hover {
+  background-color: #c62828;
+}
+
+/* Naslovi */
+h2, h3 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #023705;
+  font-size: 28px;
+  font-weight: 600;
+}
