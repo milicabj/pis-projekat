@@ -6,9 +6,15 @@ on:
   pull_request:
     branches: [main, master]
 
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/pharmacy-backend
+  FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/pharmacy-frontend
+
 jobs:
+  # ── CI: Integration ──────────────────────────────────────────────
   backend-check:
-    name: Backend — Install & Smoke Test
+    name: CI — Backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +35,7 @@ jobs:
         run: node --check server.js
 
   frontend-build:
-    name: Frontend — Install & Build
+    name: CI — Frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,15 +55,139 @@ jobs:
         working-directory: frontend/pharmacy-app
         run: npm run build -- --configuration production
 
-  docker-build:
-    name: Docker — Build Images
+  # ── CD: Build & Push Docker images to GHCR ───────────────────────
+  docker-build-push:
+    name: CD — Build & Push Images
     runs-on: ubuntu-latest
     needs: [backend-check, frontend-build]
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build backend Docker image
-        run: docker build -t pharmacy-backend:${{ github.sha }} ./backend
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build frontend Docker image
-        run: docker build -t pharmacy-frontend:${{ github.sha }} ./frontend/pharmacy-app
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend/pharmacy-app
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+            ${{ env.FRONTEND_IMAGE }}:latest
+
+  # ── CD: Deploy to Kubernetes (ephemeral kind cluster in CI) ──────
+  deploy:
+    name: CD — Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: [docker-build-push]
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: pharmacy-ci
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply Kubernetes base resources
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/mongodb-statefulset.yaml
+          kubectl apply -f k8s/mongodb-service.yaml
+          kubectl apply -f k8s/redis-deployment.yaml
+          kubectl apply -f k8s/redis-service.yaml
+          kubectl apply -f k8s/backend-service.yaml
+          kubectl apply -f k8s/frontend-configmap.yaml
+          kubectl apply -f k8s/frontend-service.yaml
+
+      - name: Create image pull secret for GHCR
+        run: |
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=${{ env.REGISTRY }} \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GITHUB_TOKEN }} \
+            -n pharmacy
+
+      - name: Deploy backend and frontend
+        env:
+          BACKEND_TAG: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          FRONTEND_TAG: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+        run: |
+          sed -e "s|pharmacy-backend:latest|${BACKEND_TAG}|g" \
+              -e 's|imagePullPolicy: Never|imagePullPolicy: Always|' \
+              k8s/backend-deployment.yaml | kubectl apply -f -
+
+          sed -e "s|pharmacy-frontend:latest|${FRONTEND_TAG}|g" \
+              -e 's|imagePullPolicy: Never|imagePullPolicy: Always|' \
+              k8s/frontend-deployment.yaml | kubectl apply -f -
+
+          kubectl patch deployment backend-deployment -n pharmacy --type=json \
+            -p='[{"op":"add","path":"/spec/template/spec/imagePullSecrets","value":[{"name":"ghcr-secret"}]}]'
+
+          kubectl patch deployment frontend-deployment -n pharmacy --type=json \
+            -p='[{"op":"add","path":"/spec/template/spec/imagePullSecrets","value":[{"name":"ghcr-secret"}]}]'
+
+      - name: Wait for deployments
+        run: |
+          kubectl rollout status statefulset/mongodb -n pharmacy --timeout=180s
+          kubectl rollout status deployment/redis -n pharmacy --timeout=120s
+          kubectl rollout status deployment/backend-deployment -n pharmacy --timeout=180s
+          kubectl rollout status deployment/frontend-deployment -n pharmacy --timeout=180s
+
+      - name: Seed database
+        run: |
+          kubectl exec -n pharmacy deployment/backend-deployment -- node seed.js
+
+      - name: Smoke test — API health
+        run: |
+          kubectl run api-test --rm -i --restart=Never -n pharmacy \
+            --image=curlimages/curl:8.5.0 -- \
+            curl -sf http://backend-service:5000/
+
+      - name: Smoke test — Redis cache (MISS then HIT)
+        run: |
+          kubectl run cache-test-miss --rm -i --restart=Never -n pharmacy \
+            --image=curlimages/curl:8.5.0 -- \
+            curl -s -D - http://frontend-service/api/products -o /dev/null | grep -i 'x-cache: miss'
+
+          kubectl run cache-test-hit --rm -i --restart=Never -n pharmacy \
+            --image=curlimages/curl:8.5.0 -- \
+            curl -s -D - http://frontend-service/api/products -o /dev/null | grep -i 'x-cache: hit'
+
+      - name: Deployment summary
+        run: |
+          echo "=== Deployed pods ==="
+          kubectl get pods -n pharmacy
+          echo "=== Deployed services ==="
+          kubectl get svc -n pharmacy
+          echo "Backend image:  ${{ env.BACKEND_IMAGE }}:${{ github.sha }}"
+          echo "Frontend image: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}"

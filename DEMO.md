@@ -53,6 +53,21 @@ docker build -t pharmacy-backend:latest ./backend
 docker build -t pharmacy-frontend:latest ./frontend/pharmacy-app
 ```
 
+**Important (Docker Desktop):** Kubernetes uses containerd and may not see images from `docker build`. If pods show `ErrImageNeverPull`, run:
+
+```bash
+chmod +x k8s/load-images.sh
+./k8s/load-images.sh
+```
+
+Or manually:
+
+```bash
+docker save pharmacy-backend:latest | docker exec -i desktop-control-plane ctr -n k8s.io images import -
+docker save pharmacy-frontend:latest | docker exec -i desktop-control-plane ctr -n k8s.io images import -
+kubectl rollout restart deployment/backend-deployment deployment/frontend-deployment -n pharmacy
+```
+
 Apply manifests:
 
 ```bash
@@ -146,14 +161,51 @@ kubectl exec -n pharmacy deployment/redis -- redis-cli KEYS "*"
 
 ---
 
-## 8. GitHub Actions
+## 8. GitHub Actions CI/CD
 
-Push to `main` or `master`:
+Pipeline file: `.github/workflows/ci-cd.yml`
+
+### What runs on every push to `main`
+
+| Job | Stage | What it does |
+|-----|-------|--------------|
+| `CI — Backend` | Integration | `npm install` + syntax check |
+| `CI — Frontend` | Integration | `npm install` + production build |
+| `CD — Build & Push Images` | Delivery | Build & push Docker images to **GHCR** |
+| `CD — Deploy to Kubernetes` | Deployment | Deploy to ephemeral **kind** cluster + smoke tests |
+
+### What runs on pull requests
+
+Only CI jobs (backend + frontend) — no deploy.
+
+### Trigger a run
+
 ```bash
+git add .
+git commit -m "Add CD deployment stage to CI/CD pipeline"
 git push origin main
 ```
 
-Open GitHub → your repo → **Actions** tab → verify CI/CD pipeline passes.
+Open: **GitHub → pis-projekat → Actions** tab
+
+### What to show at defense
+
+1. Green pipeline with all 4 jobs
+2. **Packages** tab on GitHub — `pharmacy-backend` and `pharmacy-frontend` images
+3. Deploy job logs showing:
+   - `kubectl rollout status` — pods ready
+   - `Seed uspješno završen`
+   - `x-cache: miss` then `x-cache: hit`
+
+### GHCR image locations
+
+After a successful push:
+```
+ghcr.io/milicabj/pharmacy-backend:latest
+ghcr.io/milicabj/pharmacy-frontend:latest
+```
+
+View: GitHub profile → **Packages**
 
 ---
 
