@@ -64,4 +64,3 @@ app.use("/api/logs", logRoutes);
 app.listen(5000, () => {
   console.log("Server sluša na http://localhost:5000");
 });
-hkoioioi
